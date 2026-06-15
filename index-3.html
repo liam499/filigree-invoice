@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filigree — Invoice Integrity</title>
+<meta name="description" content="Tamper-evident invoices. Cryptographic proof woven into every character. A single altered digit — an IBAN, an amount — fails verification.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --ink: #111111;
+    --mute: #6b6b6b;
+    --quiet: #a0a0a0;
+    --rule: #e5e5e2;
+    --paper: #f6f5f1;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Times New Roman", Times, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: var(--ink); color: var(--bg); }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 96px 32px 96px;
+  }
+
+  /* --- Brand --- */
+  .brand {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 96px;
+  }
+
+  /* --- Hero --- */
+  header { margin-bottom: 72px; }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+    margin-bottom: 24px;
+    max-width: 540px;
+  }
+
+  .lede {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--mute);
+    margin-bottom: 40px;
+    max-width: 540px;
+  }
+  .lede em { font-style: italic; color: var(--ink); }
+
+  .cta {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0 0 6px 0;
+    border-bottom: 1px solid var(--ink);
+    transition: opacity 0.15s ease;
+  }
+  .cta:hover { opacity: 0.5; }
+  .cta .arrow { margin-left: 6px; }
+
+  /* --- Section --- */
+  section { margin: 72px 0; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--quiet);
+    margin-bottom: 18px;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin-bottom: 18px;
+    max-width: 520px;
+  }
+
+  p {
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.65;
+    margin-bottom: 18px;
+    max-width: 520px;
+  }
+  p em { font-style: italic; }
+
+  /* --- Hairline rule --- */
+  hr.rule {
+    border: none;
+    height: 1px;
+    background: var(--rule);
+    margin: 72px 0;
+  }
+
+  /* --- Properties as numbered list --- */
+  ol.properties {
+    list-style: none;
+    counter-reset: prop;
+    margin: 8px 0 0 0;
+    padding: 0;
+  }
+  ol.properties li {
+    counter-increment: prop;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 24px;
+  }
+  ol.properties li:first-child { border-top: 1px solid var(--rule); }
+  ol.properties li::before {
+    content: counter(prop, decimal-leading-zero);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--quiet);
+    padding-top: 4px;
+  }
+  .prop-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.005em;
+  }
+  .prop-text {
+    font-size: 14px;
+    color: var(--mute);
+    line-height: 1.55;
+  }
+
+  /* --- Sale --- */
+  .sale {
+    margin-top: 72px;
+    padding-top: 56px;
+    border-top: 1px solid var(--rule);
+  }
+  .sale h2 { margin-bottom: 24px; }
+
+  .sale-contact {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 15px 32px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--ink);
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .sale-contact:hover { background: var(--mute); }
+
+  /* --- Footer --- */
+  footer {
+    margin-top: 96px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--quiet);
+    text-transform: uppercase;
+  }
+
+  /* --- Mobile --- */
+  @media (max-width: 600px) {
+    .container { padding: 56px 22px 64px; }
+    .brand { margin-bottom: 56px; }
+    h1 { font-size: 28px; }
+    .lede { font-size: 17px; }
+    h2 { font-size: 18px; }
+    section { margin: 48px 0; }
+    hr.rule { margin: 48px 0; }
+    ol.properties li {
+      grid-template-columns: 32px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="brand">Filigree</div>
+
+  <header>
+    <h1>Tamper-evident invoices.</h1>
+    <p class="lede">
+      Cryptographic proof, woven directly into the invoice text. A single altered digit — an IBAN, an amount, a line item — fails verification. <em>No metadata to strip, no signature block to detach.</em>
+    </p>
+    <a href="./demo.html" class="cta">Try the demo<span class="arrow">→</span></a>
+  </header>
+
+  <hr class="rule" />
+
+  <section>
+    <div class="section-label">The problem</div>
+    <h2>Invoice fraud has no clean defence.</h2>
+    <p>
+      Business email compromise — intercept a vendor's invoice, alter the payment instructions, forward — is the largest single category of reported business cybercrime loss. Existing protections sit beside the document, not within it: signature blocks can be stripped, certificate chains break on copy-paste, and verification typically requires a plug-in or a service account the AP clerk does not have.
+    </p>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <div class="section-label">The construction</div>
+    <h2>The signature lives inside the invoice.</h2>
+    <p>
+      Filigree distributes an ECDSA P-256 signature across every character of the invoice via invisible Unicode carriers. To a human reader the signed and unsigned invoices look identical. To the verifier — a static web page that runs entirely in the browser — they are unmistakable. No certificate authority, no network call, no plug-in.
+    </p>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <div class="section-label">Properties</div>
+    <h2>What that buys you.</h2>
+    <ol class="properties">
+      <li>
+        <div>
+          <div class="prop-title">Intrinsic</div>
+          <div class="prop-text">The signature lives in the invoice text. Cannot be stripped without destroying the visible content.</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="prop-title">Verifier-friendly</div>
+          <div class="prop-text">Paste invoice, paste public key, click. Under thirty seconds. No install, no certificate management.</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="prop-title">Binary</div>
+          <div class="prop-text">Verification passes or fails. No partial results for an AP clerk to misinterpret under pressure.</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="prop-title">Transparent</div>
+          <div class="prop-text">Signed invoices render identically in every email client, PDF reader, and ERP. Systems without Filigree are unaffected.</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="prop-title">Offline-verifiable</div>
+          <div class="prop-text">The invoice and the vendor's public key are all the AP team needs. No CA, no OCSP, no blockchain.</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="prop-title">Standard cryptography</div>
+          <div class="prop-text">ECDSA P-256 and SHA-256. The innovation is architectural — where the signature lives — not in the primitives.</div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <div class="section-label">Integration</div>
+    <h2>Less than a sprint.</h2>
+    <p>
+      The reference implementation is a single static HTML file with no build step. Drop the engine into your invoice pipeline server-side; expose verification as a paste-and-click page for AP. The fragile-watermarking literature review, carrier choice, payload distribution, canonicalisation, and channel-survival analysis are already done and documented.
+    </p>
+  </section>
+
+  <div class="sale">
+    <div class="section-label">For sale</div>
+    <h2>A one-night side project, looking for a home.</h2>
+    <p>
+      This fell out of unrelated AI research. We are not commercialising it ourselves and are looking for a buyer in AP automation, B2B fintech, e-signature, or BEC defence who can ship it as a differentiating feature.
+    </p>
+    <p>
+      Low-five-figure asking price for the IP for invoice-fraud use, scaling with exclusivity scope in adjacent verticals. Advisory hours available at an hourly rate after transfer. A companion repository contains additional reference implementations — per-recipient leak attribution, paragraph-level tamper localisation — a steganalysis CLI suite, and a working-draft protocol specification, included on request for larger deals.
+    </p>
+    <a href="mailto:liam.researchoutreach@proton.me?subject=Filigree%20invoice%20IP" class="sale-contact">liam.researchoutreach@proton.me</a>
+  </div>
+
+  <footer>
+    Filigree &middot; 2026
+  </footer>
+
+</div>
+
+</body>
+</html>
