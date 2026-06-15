@@ -1,0 +1,43 @@
+INVOICE
+
+From:
+Meridian Engineering Ltd
+14 Faraday Court
+Cambridge, CB1 3DR
+United Kingdom
+VAT: GB 384 9921 27
+
+To:
+Northwood Logistics Group
+Procurement Office
+Manchester, M3 4LZ
+United Kingdom
+
+Invoice number: 2026-0418
+Issue date: 14 June 2026
+Due date: 14 July 2026
+
+Description                                       Qty    Unit price    Amount
+Site survey, Manchester depot expansion            1      4,800.00     4,800.00
+Structural feasibility report                      1      3,200.00     3,200.00
+Senior engineer time (June)                       24        180.00     4,320.00
+Site visit travel and subsistence                  1        640.00       640.00
+
+Subtotal                                                              12,960.00
+VAT (20%)                                                              2,592.00
+Total due                                                             15,552.00
+
+Payment instructions
+Bank: Barclays Bank PLC
+Account name: Meridian Engineering Ltd
+Sort code: 20-46-12
+Account number: 73882491
+IBAN: GB29 BARC 2046 1273 8824 91
+BIC: BARCGB22
+
+Please reference invoice number 2026-0418 with your payment.
+Payment terms: net 30. Late payments accrue interest at 8% above the
+Bank of England base rate per the Late Payment of Commercial Debts
+(Interest) Act 1998.
+
+Thank you for your business.
